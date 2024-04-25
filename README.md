@@ -1,13 +1,18 @@
 # Scrapy with selenium
-[![PyPI](https://img.shields.io/pypi/v/scrapy-selenium.svg)](https://pypi.python.org/pypi/scrapy-selenium) [![Build Status](https://travis-ci.org/clemfromspace/scrapy-selenium.svg?branch=master)](https://travis-ci.org/clemfromspace/scrapy-selenium) [![Test Coverage](https://api.codeclimate.com/v1/badges/5c737098dc38a835ff96/test_coverage)](https://codeclimate.com/github/clemfromspace/scrapy-selenium/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/5c737098dc38a835ff96/maintainability)](https://codeclimate.com/github/clemfromspace/scrapy-selenium/maintainability)
+
+### Since Selenium 4.0, using `executable_path` has been deprecated.
+### This change starts causing error, e.g. [#133](https://github.com/clemfromspace/scrapy-selenium/issues/133), [#128](https://github.com/clemfromspace/scrapy-selenium/issues/128), etc.
+###
+
+---
 
 Scrapy middleware to handle javascript pages using selenium.
 
 ## Installation
 ```
-$ pip install scrapy-selenium
+$ pip install git+https://github.com/jogobeny/scrapy-selenium
 ```
-You should use **python>=3.6**. 
+You should use **python>=3.6**.
 You will also need one of the Selenium [compatible browsers](http://www.seleniumhq.org/about/platforms.jsp).
 
 ## Configuration
@@ -16,19 +21,12 @@ You will also need one of the Selenium [compatible browsers](http://www.selenium
     from shutil import which
 
     SELENIUM_DRIVER_NAME = 'firefox'
-    SELENIUM_DRIVER_EXECUTABLE_PATH = which('geckodriver')
     SELENIUM_DRIVER_ARGUMENTS=['-headless']  # '--headless' if using chrome instead of firefox
     ```
-
-Optionally, set the path to the browser executable:
-    ```python
-    SELENIUM_BROWSER_EXECUTABLE_PATH = which('firefox')
-    ```
-
 In order to use a remote Selenium driver, specify `SELENIUM_COMMAND_EXECUTOR` instead of `SELENIUM_DRIVER_EXECUTABLE_PATH`:
-    ```python
-    SELENIUM_COMMAND_EXECUTOR = 'http://localhost:4444/wd/hub'
-    ```
+```python
+SELENIUM_COMMAND_EXECUTOR = 'http://localhost:4444/wd/hub'
+```
 
 2. Add the `SeleniumMiddleware` to the downloader middlewares:
     ```python
