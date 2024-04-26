@@ -1,8 +1,10 @@
 # Scrapy with selenium
 
 ### Since Selenium 4.0, using `executable_path` has been deprecated.
-### This change starts causing error, e.g. [#133](https://github.com/clemfromspace/scrapy-selenium/issues/133), [#128](https://github.com/clemfromspace/scrapy-selenium/issues/128), etc.
-###
+### This change starts causing the error (e.g., [#133](https://github.com/clemfromspace/scrapy-selenium/issues/133), [#128](https://github.com/clemfromspace/scrapy-selenium/issues/128)):
+```bash
+builtins.TypeError: WebDriver.__init__() got an unexpected keyword argument 'executable_path'
+```
 
 ---
 
