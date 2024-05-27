@@ -10,6 +10,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from .http import SeleniumRequest
 
 
+class seleniumAddon:
+    def update_settings(self, settings):
+        settings['DOWNLOAD_MIDDLEWARES']['scrapy_selenium_addon.seleniumMiddleware'] = 800
+
+
 class SeleniumMiddleware:
     """Scrapy middleware handling the requests using selenium"""
 

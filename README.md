@@ -1,11 +1,11 @@
 # Scrapy with selenium
-[![Build Status](https://travis-ci.org/clemfromspace/scrapy-selenium.svg?branch=master)](https://travis-ci.org/clemfromspace/scrapy-selenium) [![Test Coverage](https://api.codeclimate.com/v1/badges/5c737098dc38a835ff96/test_coverage)](https://codeclimate.com/github/clemfromspace/scrapy-selenium/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/5c737098dc38a835ff96/maintainability)](https://codeclimate.com/github/clemfromspace/scrapy-selenium/maintainability)
+[![Build Status](https://travis-ci.org/sakarimov/scrapy-selenium-addon.svg?branch=master)](https://travis-ci.org/sakarimov/scrapy-selenium-addon) [![Test Coverage](https://api.codeclimate.com/v1/badges/5c737098dc38a835ff96/test_coverage)](https://codeclimate.com/github/sakarimov/scrapy-selenium-addon/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/5c737098dc38a835ff96/maintainability)](https://codeclimate.com/github/sakarimov/scrapy-selenium-addon/maintainability)
 
-Scrapy middleware to handle javascript pages using selenium.
+Scrapy middleware to handle javascript pages using selenium. this is another version of [scrapy-selenium](https://github.com/clemfromspace/scrapy-selenium) with some fixes to adapt the newest version of selenium. i make it as an addon so additional functionality can be added afterward.
 
 ## Installation
 ```
-$ pip install scrapy-selenium
+$ pip install scrapy-selenium-addon
 ```
 You should use **python>=3.6**. 
 You will also need one of the Selenium [compatible browsers](http://www.seleniumhq.org/about/platforms.jsp).
@@ -30,16 +30,16 @@ In order to use a remote Selenium driver, specify `SELENIUM_COMMAND_EXECUTOR` in
     SELENIUM_COMMAND_EXECUTOR = 'http://localhost:4444/wd/hub'
     ```
 
-2. Add the `SeleniumMiddleware` to the downloader middlewares:
+2. Add the `SeleniumMiddleware` to the ADDON:
     ```python
-    DOWNLOADER_MIDDLEWARES = {
-        'scrapy_selenium.SeleniumMiddleware': 800
+    ADDON = {
+        'scrapy_selenium_addon.seleniumAddon': 800
     }
     ```
 ## Usage
-Use the `scrapy_selenium.SeleniumRequest` instead of the scrapy built-in `Request` like below:
+Use the `scrapy_selenium_addon.SeleniumRequest` instead of the scrapy built-in `Request` like below:
 ```python
-from scrapy_selenium import SeleniumRequest
+from scrapy_selenium_addon import SeleniumRequest
 
 yield SeleniumRequest(url=url, callback=self.parse_result)
 ```
@@ -57,7 +57,7 @@ def parse_result(self, response):
 ```
 
 ### Additional arguments
-The `scrapy_selenium.SeleniumRequest` accept 4 additional arguments:
+The `scrapy_selenium_addon.SeleniumRequest` accept 4 additional arguments:
 
 #### `wait_time` / `wait_until`
 
