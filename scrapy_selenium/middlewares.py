@@ -1,9 +1,10 @@
 """This module contains the ``SeleniumMiddleware`` scrapy middleware"""
 
+from importlib import import_module
+
 from scrapy import signals
 from scrapy.exceptions import NotConfigured
 from scrapy.http import HtmlResponse
-from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 
 from .http import SeleniumRequest
@@ -12,9 +13,8 @@ from .http import SeleniumRequest
 class SeleniumMiddleware:
     """Scrapy middleware handling the requests using selenium"""
 
-    def __init__(self, driver_name, command_executor, driver_arguments):
-    # def __init__(self, driver_name, driver_executable_path,
-    #     browser_executable_path, command_executor, driver_arguments):
+    def __init__(self, driver_name, driver_executable_path,
+                 browser_executable_path, command_executor, driver_arguments):
         """Initialize the selenium webdriver
 
         Parameters
@@ -31,79 +31,74 @@ class SeleniumMiddleware:
             Selenium remote server endpoint
         """
 
-        driver_name = driver_name.lower().capitalize()
+        webdriver_base_path = f'selenium.webdriver.{driver_name}'
 
-        driver_options = getattr(webdriver, f"{driver_name}Options")()
+        driver_service_module = import_module(f'{webdriver_base_path}.service')
+        driver_service_klass = getattr(driver_service_module, "Service")
+
+        driver_klass_module = import_module(f'{webdriver_base_path}.webdriver')
+        driver_klass = getattr(driver_klass_module, 'WebDriver')
+
+        driver_options_module = import_module(f'{webdriver_base_path}.options')
+        driver_options_klass = getattr(driver_options_module, 'Options')
+
+        driver_options = driver_options_klass()
+
+        if browser_executable_path:
+            driver_options.binary_location = browser_executable_path
         for argument in driver_arguments:
             driver_options.add_argument(argument)
 
-        if command_executor:
+        driver_service = driver_service_klass(
+            executable_path=driver_executable_path)
+        driver_kwargs = {
+            'service': driver_service,
+            f'{driver_name}_options': driver_options
+        }
+
+        # locally installed driver
+        if driver_executable_path is not None:
+            driver_kwargs = {
+                'service': driver_service,
+                'options': driver_options
+            }
+            self.driver = driver_klass(**driver_kwargs)
+        # remote driver
+        elif command_executor is not None:
+            from selenium import webdriver
+            capabilities = driver_options.to_capabilities()
             self.driver = webdriver.Remote(command_executor=command_executor,
-                                           options=driver_options)
-        else:
-            driver_class = getattr(webdriver, driver_name)
-            self.driver = driver_class(options=driver_options)
-
-        # webdriver_base_path = f'selenium.webdriver.{driver_name}'
-
-        # driver_klass_module = import_module(f'{webdriver_base_path}.webdriver')
-        # driver_klass = getattr(driver_klass_module, 'WebDriver')
-
-        # driver_options_module = import_module(f'{webdriver_base_path}.options')
-        # driver_options_klass = getattr(driver_options_module, 'Options')
-
-        # driver_options = driver_options_klass()
-
-        # if browser_executable_path:
-        #     driver_options.binary_location = browser_executable_path
-        # for argument in driver_arguments:
-        #     driver_options.add_argument(argument)
-
-        # driver_kwargs = {
-        #     'executable_path': driver_executable_path,
-        #     f'{driver_name}_options': driver_options
-        # }
-
-        # # locally installed driver
-        # if driver_executable_path is not None:
-        #     driver_kwargs = {
-        #         'executable_path': driver_executable_path,
-        #         f'{driver_name}_options': driver_options
-        #     }
-        #     self.driver = driver_klass(**driver_kwargs)
-        # # remote driver
-        # elif command_executor is not None:
-        #     from selenium import webdriver
-        #     capabilities = driver_options.to_capabilities()
-        #     self.driver = webdriver.Remote(command_executor=command_executor,
-        #                                    desired_capabilities=capabilities)
+                                           desired_capabilities=capabilities)
 
     @classmethod
     def from_crawler(cls, crawler):
         """Initialize the middleware with the crawler settings"""
 
         driver_name = crawler.settings.get('SELENIUM_DRIVER_NAME')
-        # driver_executable_path = crawler.settings.get('SELENIUM_DRIVER_EXECUTABLE_PATH')
-        # browser_executable_path = crawler.settings.get('SELENIUM_BROWSER_EXECUTABLE_PATH')
+        driver_executable_path = crawler.settings.get(
+            'SELENIUM_DRIVER_EXECUTABLE_PATH')
+        browser_executable_path = crawler.settings.get(
+            'SELENIUM_BROWSER_EXECUTABLE_PATH')
         command_executor = crawler.settings.get('SELENIUM_COMMAND_EXECUTOR')
         driver_arguments = crawler.settings.get('SELENIUM_DRIVER_ARGUMENTS')
 
         if driver_name is None:
             raise NotConfigured('SELENIUM_DRIVER_NAME must be set')
 
-        # if driver_executable_path is None and command_executor is None:
-        #     raise NotConfigured('Either SELENIUM_DRIVER_EXECUTABLE_PATH '
-        #                         'or SELENIUM_COMMAND_EXECUTOR must be set')
+        if driver_executable_path is None and command_executor is None:
+            raise NotConfigured('Either SELENIUM_DRIVER_EXECUTABLE_PATH '
+                                'or SELENIUM_COMMAND_EXECUTOR must be set')
 
         middleware = cls(
             driver_name=driver_name,
-            # driver_executable_path=driver_executable_path,
-            # browser_executable_path=browser_executable_path,
+            driver_executable_path=driver_executable_path,
+            browser_executable_path=browser_executable_path,
             command_executor=command_executor,
             driver_arguments=driver_arguments
         )
 
-        crawler.signals.connect(middleware.spider_closed, signals.spider_closed)
+        crawler.signals.connect(
+            middleware.spider_closed, signals.spider_closed)
 
         return middleware
 
@@ -150,4 +145,3 @@ class SeleniumMiddleware:
         """Shutdown the driver when spider is closed"""
 
         self.driver.quit()
-

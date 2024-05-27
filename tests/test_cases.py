@@ -23,7 +23,8 @@ class BaseScrapySeleniumTestCase(TestCase):
 
         cls.settings = {
             'SELENIUM_DRIVER_NAME': 'firefox',
-            'SELENIUM_DRIVER_EXECUTABLE_PATH': which('geckodriver'),
+            'SELENIUM_DRIVER_EXECUTABLE_PATH': which('/usr/bin/geckodriver'),
+            'SELENIUM_BROWSER_EXECUTABLE_PATH': which('/usr/bin/firefox-developer-edition'),
             'SELENIUM_DRIVER_ARGUMENTS': ['-headless']
         }
         cls.spider_klass = cls.SimpleSpider
