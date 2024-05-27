@@ -1,4 +1,4 @@
-"""This module contains the base test cases for the ``scrapy_selenium`` package"""
+"""This module contains the base test cases for the ``scrapy_selenium_addon`` package"""
 
 from shutil import which
 from unittest import TestCase
@@ -7,7 +7,7 @@ import scrapy
 
 
 class BaseScrapySeleniumTestCase(TestCase):
-    """Base test case for the ``scrapy-selenium`` package"""
+    """Base test case for the ``scrapy-selenium-addon`` package"""
 
     class SimpleSpider(scrapy.Spider):
         name = 'simple_spider'

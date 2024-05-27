@@ -1,12 +1,12 @@
-"""This module contains the test cases for the middlewares of the ``scrapy_selenium`` package"""
+"""This module contains the test cases for the middlewares of the ``scrapy_selenium_addon`` package"""
 
 from unittest.mock import patch
 
 from scrapy import Request
 from scrapy.crawler import Crawler
 
-from scrapy_selenium.http import SeleniumRequest
-from scrapy_selenium.middlewares import SeleniumMiddleware
+from scrapy_selenium_addon.http import SeleniumRequest
+from scrapy_selenium_addon.middlewares import SeleniumMiddleware
 
 from .test_cases import BaseScrapySeleniumTestCase
 
